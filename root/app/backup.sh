@@ -2,6 +2,7 @@
 
 PRE_BACKUP_SCRIPT=/scripts/pre-backup.sh
 POST_BACKUP_SCRIPT=/scripts/post-backup.sh
+LOCK=/tmp/backup.lock
 
 [[ -f "/data/.duplicacy/preferences" ]] || {
   echo "Duplicacy preference not found"
@@ -13,6 +14,11 @@ cd /data
 do_backup() {
   status=0
 
+  if ! mkdir $LOCK 2>/dev/null; then
+    echo "Backup is running"
+    return
+  fi
+
   if [[ -f "$PRE_BACKUP_SCRIPT" ]]; then
     echo "Running pre-backup script"
     sh "$PRE_BACKUP_SCRIPT" 2>&1 | tee /tmp/backup.log
@@ -21,10 +27,11 @@ do_backup() {
 
   if [[ "$status" != 0 ]]; then
     echo "Pre-backup script exited with status code $status. Not performing backup." >&2
+    rmdir $LOCK
     return
   fi
 
-  echo "Backing up"
+  echo "Backing up $(date)"
   duplicacy backup $DUPLICACY_BACKUP_OPTIONS 2>&1 | tee -a /tmp/backup.log
   status="${PIPESTATUS[0]}"
 
@@ -34,11 +41,12 @@ do_backup() {
     status="${PIPESTATUS[0]}"
     echo "Post-backup script exited with status $status"
   fi
+  rmdir $LOCK
 }
 
 do_prune() {
   if [[ ! -z "$DUPLICACY_PRUNE_OPTIONS" ]]; then
-    echo "Prunning"
+    echo "Prunning $(date)"
     duplicacy -log prune $DUPLICACY_PRUNE_OPTIONS
   fi
 }
