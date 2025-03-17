@@ -3,6 +3,7 @@
 PRE_BACKUP_SCRIPT=/scripts/pre-backup.sh
 POST_BACKUP_SCRIPT=/scripts/post-backup.sh
 LOCK=/tmp/backup.lock
+PRUNE=/tmp/prune.lock
 
 [[ -f "/data/.duplicacy/preferences" ]] || {
   echo "Duplicacy preference not found"
@@ -45,10 +46,15 @@ do_backup() {
 }
 
 do_prune() {
+  if ! mkdir $PRUNE 2>/dev/null; then
+    echo "Prune is running"
+    return
+  fi
   if [[ ! -z "$DUPLICACY_PRUNE_OPTIONS" ]]; then
     echo "Prunning $(date)"
     duplicacy -log prune $DUPLICACY_PRUNE_OPTIONS
   fi
+  rmdir $PRUNE
 }
 
 case "$1" in
