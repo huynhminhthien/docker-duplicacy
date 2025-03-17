@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bash
 
-echo "$BACKUP_SCHEDULE /app/backup.sh backup" > /etc/crontabs/abc
+echo "$BACKUP_SCHEDULE /app/backup.sh backup" > /etc/crontabs/root
 
 if [[ ! -z "$PRUNE_SCHEDULE" ]]; then
- echo "$PRUNE_SCHEDULE /app/backup.sh prune" >> /etc/crontabs/abc
+ echo "$PRUNE_SCHEDULE /app/backup.sh prune" >> /etc/crontabs/root
 fi

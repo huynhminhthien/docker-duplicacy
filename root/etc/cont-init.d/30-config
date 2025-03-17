@@ -1,4 +1,4 @@
 #!/usr/bin/with-contenv bash
 
-chown abc:abc /data
-chown -f -R abc:abc /data/.duplicacy
+chown root:root /data
+chown -f -R root:root /data/.duplicacy
