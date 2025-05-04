@@ -9,8 +9,10 @@ services:
     environment:
       BACKUP_SCHEDULE: "0 */6 * * *"
       PRUNE_SCHEDULE: "0 2 * * *"
+      COPY_SCHEDULE: ""
       DUPLICACY_BACKUP_OPTIONS: "-stats"
       DUPLICACY_PRUNE_OPTIONS: "-keep 60:360 -keep 30:180 -keep 7:30 -keep 2:14 -keep 1:7"
+      DUPLICACY_COPY_OPTIONS: ""
     volumes:
       - duplicacy_store:/data
       - ./gcd-token.json:/app/gcd-token.json:ro

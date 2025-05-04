@@ -4,9 +4,11 @@ ARG DUPLICACY_VERSION=2.7.2
 
 ENV BACKUP_SCHEDULE='@hourly'
 ENV PRUNE_SCHEDULE='@daily'
+ENV COPY_SCHEDULE=''
 ENV HC_PING_ID=''
 ENV DUPLICACY_BACKUP_OPTIONS=''
 ENV DUPLICACY_PRUNE_OPTIONS='-keep 60:360 -keep 30:180 -keep 7:30 -keep 2:14 -keep 1:7'
+ENV DUPLICACY_COPY_OPTIONS=''
 
 RUN apk --no-cache add ca-certificates curl && update-ca-certificates
 

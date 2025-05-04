@@ -5,3 +5,7 @@ echo "$BACKUP_SCHEDULE /app/backup.sh backup" > /etc/crontabs/root
 if [[ ! -z "$PRUNE_SCHEDULE" ]]; then
  echo "$PRUNE_SCHEDULE /app/backup.sh prune" >> /etc/crontabs/root
 fi
+
+if [[ ! -z "$COPY_SCHEDULE" ]]; then
+ echo "$COPY_SCHEDULE /app/backup.sh copy" >> /etc/crontabs/root
+fi
