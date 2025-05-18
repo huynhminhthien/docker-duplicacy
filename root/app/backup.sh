@@ -42,13 +42,12 @@ run_with_logging() {
     log "$level" "Starting command: ${cmd[*]}"
     log "$level" "=== Command output start ==="
 
-    local output status
-    output=$("${cmd[@]}" 2>&1)
-    status=$?
-
+    # Run command and process output in real-time with a process substitution
+    # This avoids creating a subshell for the main command
+    local status=0
     while IFS= read -r line; do
         log "$level" "$line"
-    done <<< "$output"
+    done < <(${cmd[@]} 2>&1 || status=$?)
 
     log "$level" "=== Command output end ==="
     return $status
