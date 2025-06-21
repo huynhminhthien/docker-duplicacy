@@ -12,7 +12,19 @@ ENV DUPLICACY_COPY_OPTIONS=''
 
 RUN apk --no-cache add ca-certificates curl && update-ca-certificates
 
-RUN wget https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_x64_${DUPLICACY_VERSION} -O /usr/bin/duplicacy && \
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        ARCH_SUFFIX="x64"; \
+    elif [ "$ARCH" = "i386" ]; then \
+        ARCH_SUFFIX="i386"; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        ARCH_SUFFIX="arm64"; \
+    elif [ "$ARCH" = "armv7l" ]; then \
+        ARCH_SUFFIX="arm"; \
+    else \
+        echo "Unsupported architecture: $ARCH"; exit 1; \
+    fi && \
+    wget https://github.com/gilbertchen/duplicacy/releases/download/v${DUPLICACY_VERSION}/duplicacy_linux_${ARCH_SUFFIX}_${DUPLICACY_VERSION} -O /usr/bin/duplicacy && \
     chmod +x /usr/bin/duplicacy
 
 COPY root /
