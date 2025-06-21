@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2317
 
 set -euo pipefail
 
@@ -47,10 +48,10 @@ run_with_logging() {
     local status=0
     while IFS= read -r line; do
         log "$level" "$line"
-    done < <(${cmd[@]} 2>&1 || status=$?)
+    done < <("${cmd[@]}" 2>&1 || status=$?)
 
     log "$level" "=== Command output end ==="
-    return $status
+    return "$status"
 }
 
 # Simple global lock system with file-descriptor locking
@@ -89,15 +90,15 @@ do_backup() {
         log "BACKUP" "Running pre-backup script"
         run_with_logging "BACKUP" bash "$PRE_BACKUP_SCRIPT"
         status=$?
-        if [ $status -ne 0 ]; then
+        if [ "$status" -ne 0 ]; then
             log "BACKUP" "Pre-backup script failed with status $status. Aborting backup."
-            return $status
+            return "$status"
         fi
     fi
 
-    run_with_logging "BACKUP" duplicacy backup ${DUPLICACY_BACKUP_OPTIONS:-}
+    run_with_logging "BACKUP" duplicacy backup "${DUPLICACY_BACKUP_OPTIONS:-}"
     status=$?
-    if [ $status -ne 0 ]; then
+    if [ "$status" -ne 0 ]; then
         log "BACKUP" "Backup failed with status $status"
     fi
 
@@ -105,14 +106,14 @@ do_backup() {
         log "BACKUP" "Running post-backup script"
         run_with_logging "BACKUP" bash "$POST_BACKUP_SCRIPT" "$status"
         post_status=$?
-        if [ $post_status -ne 0 ]; then
+        if [ "$post_status" -ne 0 ]; then
             log "BACKUP" "Post-backup script failed with status $post_status"
             [[ $status -eq 0 ]] && status=$post_status
         fi
     fi
 
     log "BACKUP" "Backup completed with status $status"
-    return $status
+    return "$status"
 }
 
 do_prune() {
@@ -120,18 +121,18 @@ do_prune() {
 
     if [[ -n "${DUPLICACY_PRUNE_OPTIONS:-}" ]]; then
         log "PRUNE" "Starting prune operation"
-        run_with_logging "PRUNE" duplicacy prune ${DUPLICACY_PRUNE_OPTIONS}
+        run_with_logging "PRUNE" duplicacy prune "${DUPLICACY_PRUNE_OPTIONS}"
         status=$?
-        if [ $status -ne 0 ]; then
+        if [ "$status" -ne 0 ]; then
             log "PRUNE" "Prune failed with status $status"
-            return $status
+            return "$status"
         fi
         log "PRUNE" "Prune completed successfully"
     else
         log "PRUNE" "No prune options set, skipping prune"
     fi
 
-    return $status
+    return "$status"
 }
 
 do_copy() {
@@ -144,15 +145,15 @@ do_copy() {
 
     log "COPY" "Starting copy operation"
     log "COPY" "Command: duplicacy copy $DUPLICACY_COPY_OPTIONS"
-    run_with_logging "COPY" duplicacy copy ${DUPLICACY_COPY_OPTIONS}
+    run_with_logging "COPY" duplicacy copy "${DUPLICACY_COPY_OPTIONS}"
     status=$?
-    if [ $status -ne 0 ]; then
+    if [ "$status" -ne 0 ]; then
         log "COPY" "Copy operation failed with status $status"
-        return $status
+        return "$status"
     fi
 
     log "COPY" "Copy operation completed successfully"
-    return $status
+    return "$status"
 }
 
 precheck() {
@@ -169,7 +170,7 @@ precheck() {
 cleanup() {
     local exit_code=$?
     release_lock
-    exit $exit_code
+    exit "$exit_code"
 }
 
 # Set up trap for script termination
