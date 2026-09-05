@@ -1,6 +1,6 @@
 FROM ghcr.io/linuxserver/baseimage-alpine:3.21
 
-ARG DUPLICACY_VERSION=2.7.2
+ARG DUPLICACY_VERSION=3.2.5
 
 ENV BACKUP_SCHEDULE='@hourly'
 ENV PRUNE_SCHEDULE='@daily'
