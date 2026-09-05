@@ -1,3 +1,4 @@
 *.json
 .duplicacy/
 docker-compose.yml
+.env
